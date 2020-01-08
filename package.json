@@ -1,0 +1,71 @@
+{
+	"name": "compatto",
+	"version": "1.0.0",
+	"description": "Tiny and fast string compression library with unicode support",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/macarie/compatto.git"
+	},
+	"bugs": {
+		"url": "https://github.com/macarie/compatto/issues"
+	},
+	"homepage": "https://github.com/macarie/compatto#readme",
+	"author": {
+		"name": "Raul Macarie",
+		"email": "raul@macarie.me",
+		"url": "https://macarie.me"
+	},
+	"engines": {
+		"node": ">=8"
+	},
+	"scripts": {
+		"test": "xo && nyc ava"
+	},
+	"files": [
+		"index.js",
+		"index.d.ts"
+	],
+	"keywords": [
+		"smaz",
+		"data",
+		"string",
+		"strings",
+		"archive",
+		"gzip",
+		"zip",
+		"tar",
+		"compress",
+		"compression",
+		"decompress",
+		"decompression",
+		"dictionary",
+		"minify",
+		"minifier",
+		"browser"
+	],
+	"devDependencies": {
+		"ava": "^2.4.0",
+		"prettier": "^1.19.1",
+		"rollup": "^1.28.0",
+		"xo": "^0.25.3"
+	},
+	"xo": {
+		"prettier": true,
+		"ignores": [
+			"*.ts"
+		]
+	},
+	"prettier": {
+		"semi": false,
+		"bracketSpacing": true,
+		"useTabs": true,
+		"endOfLine": "lf"
+	},
+	"ava": {
+		"verbose": true,
+		"require": [
+			"esm"
+		]
+	}
+}
