@@ -1,6 +1,9 @@
+import { readFileSync } from 'fs'
 import test from 'ava'
 
 import { compatto, DecompressError } from '.'
+
+const words = readFileSync('/usr/share/dict/words', 'utf-8')
 
 test('`compatto` should not change its public properties', t => {
 	t.snapshot(compatto)
@@ -41,6 +44,18 @@ test('`compress()` should work with unicode characters', t => {
 	)
 })
 
+test('`compress()` should work with large inputs', t => {
+	t.notThrows(() => {
+		compatto.compress(words)
+	})
+})
+
+test('`compress()` cannot use an argument that is not a string', t => {
+	t.throws(() => {
+		compatto.compress(['hello'])
+	})
+})
+
 test('`decompress()` basic functionality', t => {
 	const string = compatto.decompress(
 		Uint8Array.of(...[155, 56, 172, 62, 195, 70])
@@ -65,6 +80,14 @@ test('`decompress()` should work with extra-long uncompressable strings', t => {
 
 	t.is(341, compressed.length)
 	t.is(string, decompressed)
+})
+
+test('`decompress()` should work with large buffers', t => {
+	t.notThrows(() => {
+		const compressed = compatto.compress(words)
+
+		compatto.decompress(compressed)
+	})
 })
 
 test('`decompress()` cannot use buffer that is not instance of `Uint8Array`', t => {
