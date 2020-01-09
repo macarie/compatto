@@ -20,7 +20,8 @@
 		"node": ">=8"
 	},
 	"scripts": {
-		"test": "xo && nyc ava"
+		"test": "xo && nyc --reporter=lcov ava",
+		"coverage": "codecov"
 	},
 	"files": [
 		"index.js",
@@ -46,6 +47,7 @@
 	],
 	"devDependencies": {
 		"ava": "^2.4.0",
+		"codecov": "^3.6.1",
 		"nyc": "^15.0.0",
 		"prettier": "^1.19.1",
 		"rollup": "^1.28.0",
