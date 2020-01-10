@@ -81,12 +81,11 @@ test('`decompress()` should work with unicode characters', t => {
 })
 
 test('`decompress()` should work with extra-long uncompressable strings', t => {
-	const string =
-		'❌️ 😢 🔚 😀 ✨✨✨📚️📚️📚️📚️ ⏳😀⌛️😭🐝🔀🙏👁️👁️➡️🌎❌🎶🎵🎶❌ ⬇️⬇️⬇️⬇️⬇️ ❌🆒❌🆒❌✋🤬⬆️😈☝️⏲️😠 ⬇️⬇️⬇️⬇️⬇️⬇️ ❌6⃣0⃣⏲️😄❌ ⬇️⬇️⬇️⬇️⬇️⬇️ 😢😭😢😭😢😭'
+	const string = `${'='.repeat(254)}🤣`
 	const compressed = compatto.compress(string)
 	const decompressed = compatto.decompress(compressed)
 
-	t.is(341, compressed.length)
+	t.is(262, compressed.length)
 	t.is(string, decompressed)
 })
 
