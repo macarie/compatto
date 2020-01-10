@@ -79,7 +79,7 @@ class Compatto {
 			}
 
 			throw new TypeError(
-				`The \`dictionary\` options must be an instance of 'Array', but it is an instance of '${dictionary.constructor.name}'`
+				`The \`dictionary\` option must be an instance of 'Array', but it is an instance of '${dictionary.constructor.name}'`
 			)
 		}
 
