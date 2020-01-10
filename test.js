@@ -50,6 +50,14 @@ test('`compress()` should work with large inputs', t => {
 	})
 })
 
+test('`compress()` should flush the verbatim buffer when it gets to 256 elements', t => {
+	const compressed = compatto.compress('='.repeat(260))
+
+	t.is(255, compressed[0])
+	t.is(255, compressed[1])
+	t.is(255, compressed[258])
+})
+
 test('`compress()` cannot use an argument that is not a string', t => {
 	t.throws(() => {
 		compatto.compress(['hello'])
@@ -104,6 +112,26 @@ test('`decompress()` cannot use buffer that is not instance of `Uint8Array`', t 
 })
 
 test('`decompress()` cannot use malformed buffer', t => {
+	t.throws(
+		() => {
+			compatto.decompress(Uint8Array.of(...[254]))
+		},
+		{
+			instanceOf: DecompressError,
+			message:
+				'The `buffer` argument is malformed because it has 1 elements, but wants to read at index 1'
+		}
+	)
+	t.throws(
+		() => {
+			compatto.decompress(Uint8Array.of(...[255]))
+		},
+		{
+			instanceOf: DecompressError,
+			message:
+				'The `buffer` argument is malformed because it has 1 elements, but wants to read at index 1'
+		}
+	)
 	t.throws(
 		() => {
 			compatto.decompress(Uint8Array.of(...[255, 50, 160]))
