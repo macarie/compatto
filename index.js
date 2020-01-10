@@ -237,7 +237,7 @@ class Compatto {
 			if (chunk === 254) {
 				index += 1
 
-				if (index > bufferLength) {
+				if (index >= bufferLength) {
 					throw new DecompressError(
 						`The \`buffer\` argument is malformed because it has ${bufferLength} elements, but wants to read at index ${index}`
 					)
@@ -261,7 +261,7 @@ class Compatto {
 				do {
 					index += 1
 
-					if (index > bufferLength) {
+					if (index >= bufferLength) {
 						throw new DecompressError(
 							`The \`buffer\` argument is malformed because it has ${bufferLength} elements, but wants to read at index ${index}`
 						)
