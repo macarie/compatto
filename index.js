@@ -165,7 +165,7 @@ class Compatto {
 					string.slice(index, index + chunkLength)
 				)
 
-				if (chunkCode) {
+				if (chunkCode !== undefined) {
 					if (verbatim.length > 0) {
 						push.apply(output, flushVerbatim())
 					}
