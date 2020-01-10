@@ -48,7 +48,7 @@ class Compatto {
 
 				const map = new Map()
 
-				for (let index = this.dictionary.length; index > 0; index--) {
+				for (let index = this.dictionary.length - 1; index >= 0; index--) {
 					map.set(this.dictionary[index], index)
 				}
 
