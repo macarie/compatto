@@ -78,6 +78,12 @@ class Compatto {
 				)
 			}
 
+			if (dictionary === null) {
+				throw new TypeError(
+					"The `dictionary` option must be an instance of 'Array', but it is 'null'"
+				)
+			}
+
 			throw new TypeError(
 				`The \`dictionary\` option must be an instance of 'Array', but it is an instance of '${dictionary.constructor.name}'`
 			)
@@ -303,6 +309,12 @@ const validateAndMerge = (...sources) => {
 			(!isObject(source) || Array.isArray(source)) &&
 			typeof source !== 'undefined'
 		) {
+			if (source === null) {
+				throw new TypeError(
+					"The `options` argument must be an 'object', but it is 'null'"
+				)
+			}
+
 			throw new TypeError(
 				`The \`options\` argument must be an 'object', but it is an instance of '${source.constructor.name}'`
 			)
