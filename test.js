@@ -143,3 +143,98 @@ test('`decompress()` cannot use malformed buffer', t => {
 		}
 	)
 })
+
+test('`create()` should create a new `compatto` object', t => {
+	const compattoCopy = compatto.create()
+
+	const compattoKeys = Object.keys(compatto)
+	const compattoCopyKeys = Object.keys(compattoCopy)
+
+	t.deepEqual(compattoKeys, compattoCopyKeys)
+})
+
+test('`create()` should create a working new `compatto` object', t => {
+	const compattoCopy = compatto.create()
+
+	const string = 'this is a basic string 📮'
+	const compressed = compatto.compress(string)
+	const decompressed = compatto.decompress(compressed)
+
+	t.deepEqual(compressed, compattoCopy.compress(string))
+	t.is(decompressed, compattoCopy.decompress(compressed))
+})
+
+test('`create()` should use a new dictionary', t => {
+	const compattoCopy = compatto.create({ dictionary: ['aa '] })
+
+	const compressed = compattoCopy.compress('aa b')
+
+	t.deepEqual(Uint8Array.of(...[0, 254, 98]), compressed)
+})
+
+test('`create()` cannot work with options that are not objects', t => {
+	t.throws(
+		() => {
+			compatto.create([])
+		},
+		{
+			instanceOf: TypeError,
+			message:
+				"The `options` argument must be an 'object', but it is an instance of 'Array'"
+		}
+	)
+	t.throws(
+		() => {
+			compatto.create('options')
+		},
+		{
+			instanceOf: TypeError,
+			message:
+				"The `options` argument must be an 'object', but it is an instance of 'String'"
+		}
+	)
+	t.throws(
+		() => {
+			compatto.create(null)
+		},
+		{
+			instanceOf: TypeError,
+			message: "The `options` argument must be an 'object', but it is 'null'"
+		}
+	)
+})
+
+test('`create()` cannot use malformed dictionary', t => {
+	t.throws(
+		() => {
+			compatto.create({ dictionary: new Array(300) })
+		},
+		{
+			instanceOf: TypeError,
+			message:
+				'The `dictionary` option must be an array of at most 254 elements, but it has 300'
+		}
+	)
+	t.throws(
+		() => {
+			compatto.create({ dictionary: null })
+		},
+		{
+			instanceOf: TypeError,
+			message:
+				"The `dictionary` option must be an instance of 'Array', but it is 'null'"
+		}
+	)
+	t.throws(
+		() => {
+			compatto.create({
+				dictionary: 'hello'
+			})
+		},
+		{
+			instanceOf: TypeError,
+			message:
+				"The `dictionary` option must be an instance of 'Array', but it is an instance of 'String'"
+		}
+	)
+})
