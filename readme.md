@@ -1,4 +1,4 @@
-# [compatto ![Release Version](https://img.shields.io/npm/v/compatto.svg?label=&color=0080FF)](https://www.npmjs.com/package/compatto)
+# [compatto](https://github.com/macarie/compatto) [![Release Version](https://img.shields.io/npm/v/compatto.svg?label=&color=0080FF)](https://www.npmjs.com/package/compatto)
 
 > Compatto is a tiny and fast compression library with unicode support, that works well with small strings too
 
