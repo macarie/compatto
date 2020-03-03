@@ -3,6 +3,10 @@
 	"version": "1.0.0",
 	"description": "Tiny and fast string compression library with unicode support",
 	"license": "MIT",
+	"type": "module",
+	"exports": {
+		".": "./index.js"
+	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/macarie/compatto.git"
