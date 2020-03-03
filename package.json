@@ -21,7 +21,7 @@
 		"url": "https://macarie.me"
 	},
 	"engines": {
-		"node": ">=8"
+		"node": ">=11"
 	},
 	"scripts": {
 		"test": "xo && nyc --reporter=lcov ava",
@@ -57,20 +57,12 @@
 		"xo": "^0.27.2"
 	},
 	"xo": {
-		"prettier": true,
-		"ignores": [
-			"*.ts"
-		]
+		"prettier": true
 	},
 	"prettier": {
 		"semi": false,
 		"bracketSpacing": true,
 		"useTabs": true,
 		"endOfLine": "lf"
-	},
-	"ava": {
-		"require": [
-			"esm"
-		]
 	}
 }
