@@ -25,8 +25,8 @@
 		"node": ">=11"
 	},
 	"scripts": {
-		"test": "xo && nyc --reporter=lcov ava",
-		"coverage": "codecov"
+		"test": "xo && nyc ava",
+		"coverage": "nyc report --reporter=lcov && codecov"
 	},
 	"files": [
 		"index.js",
