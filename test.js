@@ -143,6 +143,12 @@ test('`decompress()` cannot use malformed buffer', t => {
 	)
 })
 
+test("Verify `compress()`'s output with `decompress()`", t => {
+	const decompressedWords = decompress(compress(words))
+
+	t.deepEqual(words, decompressedWords)
+})
+
 test('`compatto()` should create a new `compatto` object', t => {
 	const compattoCopy = compatto({ dictionary })
 
