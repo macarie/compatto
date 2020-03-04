@@ -1,8 +1,10 @@
-/*! MIT License © Raul Macarie */
+const { push } = Array.prototype
+const { min } = Math
 
-/* eslint no-labels: [ "error", { "allowLoop": true } ] */
+const textEncoder = new TextEncoder()
+const textDecoder = new TextDecoder()
 
-class DecompressError extends Error {
+export class DecompressError extends Error {
 	constructor(message) {
 		super(message)
 
@@ -10,337 +12,267 @@ class DecompressError extends Error {
 	}
 }
 
-class Compatto {
-	constructor(customOptions) {
-		this.options = {
-			// prettier-ignore
-			dictionary: [
-				' ', 'the', 'e', 't', 'a', 'of', 'o', 'and', 'i', 'n', 's', 'e ', 'r',
-				' th', ' t', 'in', 'he', 'th', 'h', 'he ', 'to', '\r\n', 'l', 's ',
-				'd', ' a', 'an', 'er', 'c', ' o', 'd ', 'on', ' of', 're', 'of ', 't ',
-				', ', 'is', 'u', 'at', '   ', 'n ', 'or', 'which', 'f', 'm', 'as',
-				'it', 'that', '\n', 'was', 'en', '  ', ' w', 'es', ' an', ' i', '\r',
-				'f ', 'g', 'p', 'nd', ' s', 'nd ', 'ed ', 'w', 'ed', 'http://', 'for',
-				'te', 'ing', 'y ', 'The', ' c', 'ti', 'r ', 'his', 'st', ' in', 'ar',
-				'nt', ',', ' to', 'y', 'ng', ' h', 'with', 'le', 'al', 'to ', 'b',
-				'ou', 'be', 'were', ' b', 'se', 'o ', 'ent', 'ha', 'ng ', 'their', '"',
-				'hi', 'from', ' f', 'in ', 'de', 'ion', 'me', 'v', '.', 've', 'all',
-				're ', 'ri', 'ro', 'is ', 'co', 'f t', 'are', 'ea', '. ', 'her', ' m',
-				'er ', ' p', 'es ', 'by', 'they', 'di', 'ra', 'ic', 'not', 's, ',
-				'd t', 'at ', 'ce', 'la', 'h ', 'ne', 'as ', 'tio', 'on ', 'n t', 'io',
-				'we', ' a ', 'om', ', a', 's o', 'ur', 'li', 'll', 'ch', 'had', 'this',
-				'e t', 'g ', 'e\r\n', ' wh', 'ere', ' co', 'e o', 'a ', 'us', ' d',
-				'ss', '\n\r\n', '\r\n\r', '="', ' be', ' e', 's a', 'ma', 'one', 't t',
-				'or ', 'but', 'el', 'so', 'l ', 'e s', 's,', 'no', 'ter', ' wa', 'iv',
-				'ho', 'e a', ' r', 'hat', 's t', 'ns', 'ch ', 'wh', 'tr', 'ut', '/',
-				'have', 'ly ', 'ta', ' ha', ' on', 'tha', '-', ' l', 'ati', 'en ',
-				'pe', ' re', 'there', 'ass', 'si', ' fo', 'wa', 'ec', 'our', 'who',
-				'its', 'z', 'fo', 'rs', '>', 'ot', 'un', '<', 'im', 'th ', 'nc', 'ate',
-				'><', 'ver', 'ad', ' we', 'ly', 'ee', ' n', 'id', ' cl', 'ac', 'il',
-				'</', 'rt', ' wi', 'div', 'e, ', ' it', 'whi', ' ma', 'ge', 'x', 'e c',
-				'men', '.com'
-			],
+const createMessage = (...messages) => {
+	return messages.join(' ')
+}
 
-			...customOptions,
+const createTrie = strings => {
+	const trieRoot = new Map()
 
-			get dictionaryIndex() {
-				delete this.dictionaryIndex
+	strings.forEach((string, index) => {
+		let trie = trieRoot
 
-				const map = new Map()
+		const characters = string[Symbol.iterator]()
 
-				for (let index = this.dictionary.length - 1; index >= 0; index--) {
-					map.set(this.dictionary[index], index)
+		for (const character of characters) {
+			let branch = trie.get(character)
+
+			if (!branch) {
+				const newBranch = new Map()
+
+				trie.set(character, newBranch)
+
+				branch = newBranch
+			}
+
+			trie = branch
+		}
+
+		trie.value = index
+	})
+
+	return trieRoot
+}
+
+const flushVerbatim = (verbatim, bytesToRemove) => {
+	const chunk = []
+
+	if (bytesToRemove > 1) {
+		chunk.push(255)
+		chunk.push(bytesToRemove - 1)
+	} else {
+		chunk.push(254)
+	}
+
+	push.apply(chunk, verbatim.splice(0, bytesToRemove))
+
+	return chunk
+}
+
+const compress = (string, trie) => {
+	const characters = [...string]
+	const charactersLength = characters.length
+
+	const verbatim = []
+	const progress = []
+	let trieNode = trie
+	let characterIndex = 0
+
+	const bytes = []
+
+	while (characterIndex <= charactersLength) {
+		const character = characters[characterIndex]
+		trieNode = trieNode.get(character)
+
+		if (character) {
+			progress.push({
+				character,
+				value: trieNode ? trieNode.value : undefined
+			})
+		}
+
+		if (trieNode) {
+			characterIndex += 1
+
+			continue
+		}
+
+		let progressIndex = progress.length - 1
+
+		for (; progressIndex >= 0; progressIndex--) {
+			if (progress[progressIndex].value !== undefined) {
+				while (verbatim.length > 0) {
+					push.apply(bytes, flushVerbatim(verbatim, min(256, verbatim.length)))
 				}
 
-				this.dictionaryIndex = map
+				bytes.push(progress[progressIndex].value)
 
-				return map
-			},
-			get longestDictionaryWordLength() {
-				delete this.longestDictionaryWordLength
-
-				const longestDictionaryWordLength = Math.max(
-					...this.dictionary.map(element => element.length)
-				)
-
-				this.longestDictionaryWordLength = longestDictionaryWordLength
-
-				return longestDictionaryWordLength
+				break
 			}
 		}
 
-		const { dictionary } = this.options
+		if (progressIndex === -1 && progress.length > 0) {
+			push.apply(verbatim, textEncoder.encode(progress[0].character))
 
-		if (!Array.isArray(dictionary) || dictionary.length > 254) {
-			if (Array.isArray(dictionary)) {
-				throw new TypeError(
-					`The \`dictionary\` option must be an array of at most 254 elements, but it has ${dictionary.length}`
-				)
+			while (verbatim.length >= 256) {
+				push.apply(bytes, flushVerbatim(verbatim, 256))
 			}
 
-			if (dictionary === null) {
-				throw new TypeError(
-					"The `dictionary` option must be an instance of 'Array', but it is 'null'"
-				)
-			}
-
-			throw new TypeError(
-				`The \`dictionary\` option must be an instance of 'Array', but it is an instance of '${dictionary.constructor.name}'`
-			)
+			characterIndex += 1
 		}
 
-		this.verbatim = []
-		this.textEncoder = new TextEncoder()
-		this.textDecoder = new TextDecoder()
+		if (progressIndex) {
+			characterIndex -= progress.length - progressIndex - 2
+		}
 
-		this.compress = this.compress.bind(this)
-		this.decompress = this.decompress.bind(this)
+		progress.length = 0
+
+		trieNode = trie
 	}
 
-	createVerbatimFlusher() {
-		const { push } = Array.prototype
-
-		const { verbatim } = this
-
-		const chunk = []
-
-		return () => {
-			const verbatimLength = verbatim.length
-
-			chunk.length = 0
-
-			if (verbatimLength > 1) {
-				chunk.push(255)
-				chunk.push(verbatimLength - 1)
-			} else {
-				chunk.push(254)
-			}
-
-			push.apply(chunk, verbatim)
-
-			verbatim.length = 0
-
-			return chunk
-		}
+	if (verbatim.length > 0) {
+		push.apply(bytes, flushVerbatim(verbatim, verbatim.length))
 	}
 
-	compress(string) {
-		if (typeof string !== 'string') {
-			throw new TypeError(
-				`The \`string\` argument must be of type 'string', but it is of type '${typeof string}'`
-			)
-		}
+	try {
+		return Uint8Array.of(...bytes)
+	} catch (_) {
+		return new Uint8Array(bytes)
+	}
+}
 
-		const { push } = Array.prototype
+const decompress = (bytes, dictionary) => {
+	const bytesLength = bytes.length
+	let index = 0
 
-		const { options, textEncoder, verbatim } = this
+	let string = ''
 
-		const { dictionaryIndex, longestDictionaryWordLength } = options
+	while (index < bytesLength) {
+		const chunk = bytes[index]
 
-		const flushVerbatim = this.createVerbatimFlusher()
+		if (chunk === 254) {
+			index += 1
 
-		const output = []
-
-		// The iterator is used to correctly handle unicode characters
-		const stringIterator = string[Symbol.iterator]()
-		const stringLength = string.length
-
-		let index = 0
-
-		compressLoop: while (index < stringLength) {
-			// Set the maximum string length to look up for in the dictionary
-			let maximumWordLength = longestDictionaryWordLength
-
-			if (stringLength - index < maximumWordLength) {
-				maximumWordLength = stringLength - index
-			}
-
-			// Try to look up for a word inside the dictionary
-			for (
-				let chunkLength = maximumWordLength;
-				chunkLength > 0;
-				chunkLength--
-			) {
-				const chunkCode = dictionaryIndex.get(
-					string.slice(index, index + chunkLength)
+			if (index >= bytesLength) {
+				throw new DecompressError(
+					createMessage(
+						`The \`bytes\` argument is malformed because it has ${bytesLength} elements.`,
+						`It wants to read at index ${index}.`
+					)
 				)
-
-				if (chunkCode !== undefined) {
-					if (verbatim.length > 0) {
-						push.apply(output, flushVerbatim())
-					}
-
-					output.push(chunkCode)
-
-					index += chunkLength
-
-					// Every character in the dictionary is one byte, so the iterator
-					//  should skip `chunkLength` characters from the string
-					for (let skip = chunkLength; skip > 0; skip--) stringIterator.next()
-
-					continue compressLoop
-				}
 			}
 
-			// There were no matches inside the dictionary, so get the next real
-			//  unicode character from the string and encode it
-			// This is necessary because string[i] doesn't work well with unicode
-			//  characters, like emojis ☹️
-			const character = stringIterator.next().value
-			const encodedCharacter = textEncoder.encode(character)
+			string += textDecoder.decode(bytes.slice(index, index + 1))
 
-			if (verbatim.length + encodedCharacter.length > 256) {
-				push.apply(output, flushVerbatim())
-			}
+			index += 1
 
-			push.apply(verbatim, encodedCharacter)
-
-			if (verbatim.length === 256) {
-				push.apply(output, flushVerbatim())
-			}
-
-			// The encoded character might have been longer than one byte, so add
-			//  its, as stated above, buggy length to the index
-			index += character.length
+			continue
 		}
 
-		if (verbatim.length > 0) {
-			push.apply(output, flushVerbatim())
-		}
+		if (chunk === 255) {
+			let verbatimStart
+			let verbatimEnd
 
-		// Using `Uint8Array.of(...output)` may lead to reach the maximum call
-		//  stack size, so...
-		try {
-			// eslint-disable-next-line prefer-spread
-			return Uint8Array.of.apply(Uint8Array, output)
-		} catch (_) {
-			return new Uint8Array(output)
-		}
-	}
+			const chunkToDecode = []
 
-	decompress(buffer) {
-		if (buffer.constructor.name !== 'Uint8Array') {
-			throw new TypeError(
-				`The \`buffer\` argument must be an instance of 'Uint8Array', but it is an instance of '${buffer.constructor.name}'`
-			)
-		}
-
-		const { push } = Array.prototype
-
-		const { options, textDecoder } = this
-
-		const { dictionary } = options
-
-		let output = ''
-
-		const bufferLength = buffer.length
-
-		let index = 0
-
-		while (index < bufferLength) {
-			const chunk = buffer[index]
-
-			if (chunk === 254) {
+			do {
 				index += 1
 
-				if (index >= bufferLength) {
+				if (index >= bytesLength) {
 					throw new DecompressError(
-						`The \`buffer\` argument is malformed because it has ${bufferLength} elements, but wants to read at index ${index}`
+						createMessage(
+							`The \`bytes\` argument is malformed because it has ${bytesLength} elements.`,
+							`It wants to read at index ${index}.`
+						)
 					)
 				}
 
-				output += textDecoder.decode(buffer.slice(index, index + 1))
+				verbatimStart = index + 1
+				verbatimEnd = index + bytes[index] + 2
 
+				if (verbatimEnd > bytesLength) {
+					throw new DecompressError(
+						createMessage(
+							`The \`bytes\` argument is malformed because it has ${bytesLength} elements.`,
+							`It wants to read from index ${index} to ${verbatimEnd}.`
+						)
+					)
+				}
+
+				push.apply(chunkToDecode, bytes.slice(verbatimStart, verbatimEnd))
+
+				index = verbatimEnd
+			} while (bytes[index] === 255)
+
+			if (bytes[index] === 254) {
 				index += 1
 
-				continue
+				if (index >= bytesLength) {
+					throw new DecompressError(
+						createMessage(
+							`The \`bytes\` argument is malformed because it has ${bytesLength} elements.`,
+							`It wants to read at index ${index}.`
+						)
+					)
+				}
+
+				chunkToDecode.push(bytes.slice(index, index + 1))
+
+				index += 1
 			}
 
-			if (chunk === 255) {
-				let verbatimStart
-				let verbatimEnd
+			string += textDecoder.decode(Uint8Array.of(...chunkToDecode))
 
-				const chunkToDecode = []
-
-				// To correctly decompress unicode characters all bytes have to be
-				//  decoded at once
-				do {
-					index += 1
-
-					if (index >= bufferLength) {
-						throw new DecompressError(
-							`The \`buffer\` argument is malformed because it has ${bufferLength} elements, but wants to read at index ${index}`
-						)
-					}
-
-					verbatimStart = index + 1
-					verbatimEnd = index + buffer[index] + 2
-
-					if (verbatimEnd > bufferLength) {
-						throw new DecompressError(
-							`The \`buffer\` argument is malformed because it has ${bufferLength} elements, but wants to read from index ${index} to ${verbatimEnd}`
-						)
-					}
-
-					push.apply(chunkToDecode, buffer.slice(verbatimStart, verbatimEnd))
-
-					index = verbatimEnd
-				} while (buffer[index] === 255)
-
-				output += textDecoder.decode(Uint8Array.of(...chunkToDecode))
-
-				continue
-			}
-
-			output += dictionary[chunk]
-
-			index += 1
+			continue
 		}
 
-		return output
+		string += dictionary[chunk]
+
+		index += 1
 	}
+
+	return string
 }
 
-const isObject = source => source !== null && typeof source === 'object'
+export const compatto = ({ dictionary } = {}) => {
+	if (!Array.isArray(dictionary) || dictionary.length > 254) {
+		throw new TypeError(
+			createMessage(
+				'The `dictionary` option must be an array with at most 254 elements.',
+				Array.isArray(dictionary)
+					? `It has ${dictionary.length} elements.`
+					: `It is \`${
+							typeof dictionary === 'undefined' || dictionary === null
+								? dictionary
+								: dictionary.constructor.name
+					  }\`.`
+			)
+		)
+	}
 
-const validateAndMerge = (...sources) => {
-	for (const source of sources) {
-		if (
-			(!isObject(source) || Array.isArray(source)) &&
-			typeof source !== 'undefined'
-		) {
-			if (source === null) {
+	const trie = createTrie(dictionary)
+
+	return {
+		compress(string) {
+			if (typeof string !== 'string') {
 				throw new TypeError(
-					"The `options` argument must be an 'object', but it is 'null'"
+					createMessage(
+						"The `string` argument must be of type 'string'.",
+						`Its type is \`${typeof string}\`.`
+					)
 				)
 			}
 
-			throw new TypeError(
-				`The \`options\` argument must be an 'object', but it is an instance of '${source.constructor.name}'`
-			)
+			return compress(string, trie)
+		},
+		decompress(bytes) {
+			if (
+				typeof bytes !== 'object' ||
+				(bytes && bytes.constructor.name !== 'Uint8Array')
+			) {
+				throw new TypeError(
+					createMessage(
+						"The `buffer` argument must be an instance of 'Uint8Array'.",
+						`It is ${
+							typeof bytes === 'undefined' || bytes === null
+								? `\`${bytes}\``
+								: `an instance of \`${bytes.constructor.name}\``
+						}.`
+					)
+				)
+			}
+
+			return decompress(bytes, dictionary)
 		}
 	}
-
-	return Object.assign({}, ...sources)
 }
-
-const exportableMethods = ['compress', 'decompress']
-
-const createInstance = defaultOptions => {
-	const compattoInstance = new Compatto(validateAndMerge(defaultOptions))
-
-	const compatto = {}
-
-	for (const method of exportableMethods) {
-		compatto[method] = compattoInstance[method]
-	}
-
-	compatto.create = options =>
-		createInstance(validateAndMerge(defaultOptions, options))
-
-	return compatto
-}
-
-const compatto = createInstance(undefined)
-
-export { DecompressError, compatto }
