@@ -59,7 +59,18 @@
 		"xo": "^0.27.2"
 	},
 	"xo": {
-		"prettier": true
+		"prettier": true,
+		"rules": {
+			"unicorn/import-index": [
+				"off"
+			],
+			"import/extensions": [
+				"off"
+			],
+			"import/no-useless-path-segments": [
+				"off"
+			]
+		}
 	},
 	"prettier": {
 		"semi": false,
