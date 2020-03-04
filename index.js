@@ -108,12 +108,18 @@ const compress = (string, trie) => {
 				push.apply(bytes, flushVerbatim(verbatim, 256))
 			}
 
-			characterIndex += 1
+			if (progress.length > 1) {
+				characterIndex -= progress.length - 1
+			}
+
+			progress.length = 0
 		}
 
-		if (progressIndex) {
-			characterIndex -= progress.length - progressIndex - 2
+		if (progressIndex >= 0) {
+			characterIndex -= progress.length - progressIndex - 1
 		}
+
+		characterIndex += 1
 
 		progress.length = 0
 
