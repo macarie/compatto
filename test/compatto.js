@@ -2,8 +2,8 @@ import { readFileSync } from 'fs'
 
 import test from 'ava'
 
-import { dictionary } from './dictionary.js'
-import { compatto, DecompressError } from './index.js'
+import { dictionary } from '../dictionary.js'
+import { compatto, DecompressError } from '../index.js'
 
 const { compress, decompress } = compatto({ dictionary })
 
