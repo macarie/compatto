@@ -31,7 +31,8 @@
 	"files": [
 		"index.js",
 		"index.d.ts",
-		"dictionary.js"
+		"dictionary.js",
+		"dictionary.d.ts"
 	],
 	"keywords": [
 		"smaz",
