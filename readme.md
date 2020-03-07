@@ -8,9 +8,9 @@ Compatto is based on [antirez](https://github.com/antirez/)'s [smaz](https://git
 
 ## Features
 
-- User-definable dictionary to compress and decompress strings
-- Supports Unicode characters, like emojis 🎉
-- It is _very_ fast
+- ⏱ Very fast to compress, even faster to decompress
+- 🙌🏼 Support for Unicode characters, like emojis
+- 🗄 User-definable dictionary
 
 ## Install
 
