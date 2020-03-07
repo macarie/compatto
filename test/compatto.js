@@ -78,7 +78,7 @@ test('`decompress()` should work with unicode characters', t => {
 	t.is(string, decompressed)
 })
 
-test('`decompress()` should work with extra-long uncompressable strings', t => {
+test('`decompress()` should work with extra-long incompressible strings', t => {
 	let string = `${'='.repeat(254)}📮`
 	let compressed = compress(string)
 	let decompressed = decompress(compressed)
