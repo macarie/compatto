@@ -10,7 +10,7 @@ Compatto is based on [antirez](https://github.com/antirez/)'s [smaz](https://git
 ## Features
 
 - ⏱ Very [fast](#performance) to compress, even faster to decompress
-- 🙌🏼 Support for Unicode characters, like emojis
+- 🍯 Support for Unicode characters, like emojis
 - 🗄 User-definable dictionary
 
 ## Install
@@ -104,7 +104,7 @@ Since `v2.0`, compatto generates a trie from the dictionary that is used to comp
 
 For compressible strings it was not _that_ slow, but if a word has characters that are not inside the dictionary that approach was _really_ slow!
 
-This implementation change gave compatto a big performance boost 🏎💨
+This implementation change gave compatto a big performance boost 🛒💨
 
 To compress every word in `/usr/share/dict/words`, 235,887 words, `v1.0` took `~500ms`, while `v2.0` takes only `~370ms`. When trying to compress the whole file, that is ~2.5MB, without splitting the rows, `v1.0` took `~700ms`, while `v2.0` takes just `~465ms`.
 
