@@ -31,7 +31,7 @@ $ yarn add compatto
 import { dictionary } from "compatto/dictionary"
 import { compatto, DecompressError } from "compatto"
 
-const { compress, decompress } = compatto(dictionary)
+const { compress, decompress } = compatto({ dictionary })
 
 const compressedString = compress("this is a string")
 // =>  Uint8Array [ 155, 56, 172, 62, 195, 70 ]
