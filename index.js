@@ -238,7 +238,7 @@ export const compatto = ({ dictionary } = {}) => {
 				Array.isArray(dictionary)
 					? `It has ${dictionary.length} elements.`
 					: `It is \`${
-							typeof dictionary === 'undefined' || dictionary === null
+							dictionary === undefined || dictionary === null
 								? dictionary
 								: dictionary.constructor.name
 					  }\`.`
@@ -263,14 +263,15 @@ export const compatto = ({ dictionary } = {}) => {
 		},
 		decompress(bytes) {
 			if (
-				typeof bytes !== 'object' ||
-				(bytes && bytes.constructor.name !== 'Uint8Array')
+				bytes === undefined ||
+				bytes === null ||
+				bytes.constructor.name !== 'Uint8Array'
 			) {
 				throw new TypeError(
 					createMessage(
 						"The `buffer` argument must be an instance of 'Uint8Array'.",
 						`It is ${
-							typeof bytes === 'undefined' || bytes === null
+							bytes === undefined || bytes === null
 								? `\`${bytes}\``
 								: `an instance of \`${bytes.constructor.name}\``
 						}.`
