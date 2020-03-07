@@ -104,3 +104,7 @@ The latest version of Chrome, Firefox, Safari, and Edge.
 ## Node.js support
 
 Compatto requires Node.js 11 or later.
+
+## Related
+
+- [hex-my-bytes](https://github.com/macarie/hex-my-bytes) - Display bytes sequences as strings of hexadecimal digits.
