@@ -25,8 +25,8 @@
 		"node": ">=11"
 	},
 	"scripts": {
-		"test": "xo && nyc ava",
-		"coverage": "nyc report --reporter=lcov && codecov"
+		"test": "xo && c8 ava --verbose",
+		"coverage": "c8 report --reporter=text-lcov && codecov"
 	},
 	"files": [
 		"index.js",
@@ -54,8 +54,8 @@
 	],
 	"devDependencies": {
 		"ava": "^3.4.0",
+		"c8": "^7.1.0",
 		"codecov": "^3.6.5",
-		"nyc": "^15.0.0",
 		"prettier": "^1.19.1",
 		"xo": "^0.27.2"
 	},
