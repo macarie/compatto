@@ -1,6 +1,6 @@
 # [compatto](https://github.com/macarie/compatto) [![Release Version](https://img.shields.io/npm/v/compatto.svg?label=&color=0080FF)](https://www.npmjs.com/package/compatto)
 
-> Compatto is a tiny and fast compression library with unicode support, that works well with small strings too
+> Compatto is a tiny and fast compression library with Unicode support, that works well with small strings too
 
 [![Build Status](https://img.shields.io/travis/com/macarie/compatto)](https://travis-ci.com/macarie/compatto) [![Coverage Status](https://img.shields.io/codecov/c/github/macarie/compatto)](https://codecov.io/gh/macarie/compatto/)
 
@@ -43,7 +43,7 @@ const decompressedString = decompress(compressedString)
 
 ### compatto(options)
 
-Create a new object, that implements the `Compatto` interface, using the options you provide.
+Create a new object that implements the [`Compatto`](#compatto) interface, using the options you provide.
 
 #### options
 
@@ -53,15 +53,19 @@ Type: `object`
 
 Type: `string[]`
 
-A dictionary used while compressing and decompressing strings, if it has a length greater than `254` a `TypeError` will be thrown.
+A dictionary used to compress and decompress strings. If its length is greater than `254` a `TypeError` will be thrown.
 
-_Please note that, as of `v2.0`, this option is not provided by default, the user has to explicitly pass it._
+_Please note that, as of `v2.0`, this option has no default value, the user has to explicitly pass it._
 
-### Compatto.compress()
+### Compatto
+
+Compatto is an interface that has two methods: [`compress()`](#compressstring) and [`decompress()`](#decompressbytes), the returned value of [`compress(options)`](#compattooptions) implements this interface.
+
+#### compress(string)
 
 Compress a string into an array of bytes, returned as an instance of `Uint8Array`.
 
-#### string
+##### string
 
 Type: `string`
 
@@ -69,13 +73,13 @@ A string to compress.
 
 Throws a `TypeError` if the argument is not the correct type.
 
-### Compatto.decompress(bytes)
+#### decompress(bytes)
 
 Decompress an instance of `Uint8Array` to the original, uncompressed, string.
 
 Throws a `DecompressError` if the buffer is not correctly encoded.
 
-#### bytes
+##### bytes
 
 Type: `Uint8Array`
 
@@ -83,9 +87,13 @@ An array of bytes representing a compressed string.
 
 Throws a `TypeError` if the argument is not the correct type.
 
-Notes:
+_Please note that if the dictionary used to compress a string is not the same used to decompress the generated buffer, the result of the decompression will most likely **not** be correct._
 
-- If the compression and decompression dictionaries don't match the result will likely **not** be a human-readable string.
+### dictionary
+
+Type: `string[]`
+
+This is compatto's standard dictionary. Remember that even if it is the _standard_ one, it must be explicitly set by the user!
 
 ## Browser support
 
