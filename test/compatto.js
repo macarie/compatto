@@ -79,11 +79,18 @@ test('`decompress()` should work with unicode characters', t => {
 })
 
 test('`decompress()` should work with extra-long uncompressable strings', t => {
-	const string = `${'='.repeat(254)}🤣`
-	const compressed = compress(string)
-	const decompressed = decompress(compressed)
+	let string = `${'='.repeat(254)}📮`
+	let compressed = compress(string)
+	let decompressed = decompress(compressed)
 
 	t.is(262, compressed.length)
+	t.is(string, decompressed)
+
+	string = `${'='.repeat(253)}📮`
+	compressed = compress(string)
+	decompressed = decompress(compressed)
+
+	t.is(260, compressed.length)
 	t.is(string, decompressed)
 })
 
@@ -104,6 +111,28 @@ test('`decompress()` cannot use buffer that is not instance of `Uint8Array`', t 
 			instanceOf: TypeError,
 			message:
 				"The `buffer` argument must be an instance of 'Uint8Array'. It is an instance of `Array`."
+		}
+	)
+
+	t.throws(
+		() => {
+			decompress(null)
+		},
+		{
+			instanceOf: TypeError,
+			message:
+				"The `buffer` argument must be an instance of 'Uint8Array'. It is `null`."
+		}
+	)
+
+	t.throws(
+		() => {
+			decompress()
+		},
+		{
+			instanceOf: TypeError,
+			message:
+				"The `buffer` argument must be an instance of 'Uint8Array'. It is `undefined`."
 		}
 	)
 })
@@ -139,6 +168,29 @@ test('`decompress()` cannot use malformed buffer', t => {
 			instanceOf: DecompressError,
 			message:
 				'The `bytes` argument is malformed because it has 3 elements. It wants to read from index 1 to 53.'
+		}
+	)
+
+	t.throws(
+		() => {
+			decompress(
+				Uint8Array.of(
+					...[
+						255,
+						255,
+						'61 '
+							.repeat(256)
+							.split(' ')
+							.filter(Boolean),
+						254
+					].flat()
+				)
+			)
+		},
+		{
+			instanceOf: DecompressError,
+			message:
+				'The `bytes` argument is malformed because it has 259 elements. It wants to read at index 259.'
 		}
 	)
 })
