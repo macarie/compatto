@@ -67,27 +67,27 @@ The returned value of [`compatto()`](#compattooptions) implements this interface
 
 Compress a string into an array of bytes, returned as an instance of `Uint8Array`.
 
+Throws a `TypeError` if the argument is not the correct type.
+
 ##### string
 
 Type: `string`
 
 A string to compress.
 
-Throws a `TypeError` if the argument is not the correct type.
-
 #### decompress(bytes)
 
 Decompress an instance of `Uint8Array` to the original, uncompressed, string.
 
-Throws a `DecompressError` if the buffer is not correctly encoded.
+Throws a `TypeError` if the argument is not the correct type.
+
+Throws a `DecompressError` if the buffer is not correctly encoded. It can be imported along with `compatto()` if you want to check if the error thrown is an instance of this class.
 
 ##### bytes
 
 Type: `Uint8Array`
 
 An array of bytes representing a compressed string.
-
-Throws a `TypeError` if the argument is not the correct type.
 
 _Please note that if the dictionary used to compress a string is not the same used to decompress the generated buffer, the result of the decompression will most likely **not** be correct._
 
