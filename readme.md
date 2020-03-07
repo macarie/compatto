@@ -59,7 +59,9 @@ _Please note that, as of `v2.0`, this option has no default value, the user has 
 
 ### Compatto
 
-Compatto is an interface that has two methods: [`compress()`](#compressstring) and [`decompress()`](#decompressbytes), the returned value of [`compress(options)`](#compattooptions) implements this interface.
+Compatto is an interface that has two methods: [`compress()`](#compressstring) and [`decompress()`](#decompressbytes).
+
+The returned value of [`compatto()`](#compattooptions) implements this interface.
 
 #### compress(string)
 
