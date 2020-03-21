@@ -44,6 +44,44 @@ const createTrie = strings => {
 	return trieRoot
 }
 
+const retrieveWord = (trie, characters, characterAt) => {
+	let trieNode = trie
+	let index = characterAt
+
+	const retrievedCharacters = []
+
+	do {
+		trieNode = trieNode.get(characters[index])
+
+		if (trieNode) {
+			retrievedCharacters.push({
+				character: characters[index],
+				value: trieNode.value,
+				index
+			})
+
+			index += 1
+		}
+	} while (trieNode && characters[index])
+
+	let retrievedIndex = retrievedCharacters.length - 1
+
+	while (
+		retrievedIndex > 0 &&
+		retrievedCharacters[retrievedIndex].value === undefined
+	) {
+		retrievedIndex -= 1
+	}
+
+	return [
+		retrievedCharacters[retrievedIndex] &&
+			retrievedCharacters[retrievedIndex].value,
+		((retrievedCharacters[retrievedIndex] &&
+			retrievedCharacters[retrievedIndex].index) ||
+			characterAt) + 1
+	]
+}
+
 const flushVerbatim = (verbatim, bytesToRemove) => {
 	const chunk = []
 
@@ -64,66 +102,29 @@ const compress = (string, trie) => {
 	const charactersLength = characters.length
 
 	const verbatim = []
-	const progress = []
-	let trieNode = trie
 	let characterIndex = 0
 
 	const bytes = []
 
-	while (characterIndex <= charactersLength) {
-		const character = characters[characterIndex]
-		trieNode = trieNode.get(character)
+	while (characterIndex < charactersLength) {
+		const [byte, nextIndex] = retrieveWord(trie, characters, characterIndex)
 
-		if (character) {
-			progress.push({
-				character,
-				value: trieNode ? trieNode.value : undefined
-			})
-		}
-
-		if (trieNode) {
-			characterIndex += 1
-
-			continue
-		}
-
-		let progressIndex = progress.length - 1
-
-		for (; progressIndex >= 0; progressIndex--) {
-			if (progress[progressIndex].value !== undefined) {
-				while (verbatim.length > 0) {
-					push.apply(bytes, flushVerbatim(verbatim, min(256, verbatim.length)))
-				}
-
-				bytes.push(progress[progressIndex].value)
-
-				break
+		// eslint-disable-next-line no-negated-condition
+		if (byte !== undefined) {
+			while (verbatim.length > 0) {
+				push.apply(bytes, flushVerbatim(verbatim, min(256, verbatim.length)))
 			}
-		}
 
-		if (progressIndex === -1 && progress.length > 0) {
-			push.apply(verbatim, textEncoder.encode(progress[0].character))
+			bytes.push(byte)
+		} else {
+			push.apply(verbatim, textEncoder.encode(characters[characterIndex]))
 
 			while (verbatim.length >= 256) {
 				push.apply(bytes, flushVerbatim(verbatim, 256))
 			}
-
-			if (progress.length > 1) {
-				characterIndex -= progress.length - 1
-			}
-
-			progress.length = 0
 		}
 
-		if (progressIndex >= 0) {
-			characterIndex -= progress.length - progressIndex - 1
-		}
-
-		characterIndex += 1
-
-		progress.length = 0
-
-		trieNode = trie
+		characterIndex = nextIndex
 	}
 
 	if (verbatim.length > 0) {
