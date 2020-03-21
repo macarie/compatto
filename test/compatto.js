@@ -199,6 +199,10 @@ test("Verify `compress()`'s output with `decompress()`", t => {
 	const decompressedWords = decompress(compress(words))
 
 	t.deepEqual(words, decompressedWords)
+
+	const compressedWords = words.split('\n').map(compress)
+
+	t.deepEqual(words, compressedWords.map(decompress).join('\n'))
 })
 
 test('`compatto()` should create a new `compatto` object', t => {
