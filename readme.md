@@ -9,7 +9,7 @@ Compatto is based on [antirez](https://github.com/antirez/)'s [smaz](https://git
 
 ## Features
 
-- ⏱ Very [fast](#performance) to compress, even faster to decompress
+- ⏱ [Very fast](#performance) to compress, even faster to decompress
 - 🍯 Support for Unicode characters, like emojis
 - 🗄 User-definable dictionary
 
@@ -102,13 +102,17 @@ This is compatto's standard dictionary. Remember that even if it is the _standar
 
 Since `v2.0`, compatto generates a trie from the dictionary that is used to compress every string. Before `v2.0`, compatto tried to get a substring as long as the longest word in the dictionary and see if that substring was in it. If it wasn't, it tried again with a substring that was one character shorter, and so on until the substring was one character.
 
-For compressible strings it was not _that_ slow, but if a word has characters that are not inside the dictionary that approach was _really_ slow!
+For compressible strings it was not _that_ slow, but if a word had characters that were not inside the dictionary that approach was _really_ slow!
 
-This implementation change gave compatto a big performance boost 🛒💨
+This implementation change gave compatto a big performance boost 🚌💨
 
-To compress every word in `/usr/share/dict/words`, 235,887 words, `v1.0` took `~500ms`, while `v2.0` takes only `~370ms`. When trying to compress the whole file, that is ~2.5MB, without splitting the rows, `v1.0` took `~700ms`, while `v2.0` takes just `~465ms`.
+In `v2.1` the `compress()` algorithm was simplified, thus leading to a performance improvement of about 20% compared to `v2.0` 🐌
 
-Is there space for improvements? **Absolutely**! The compression algorithm can be further improved, and keep in mind that I didn't have time to do a code profiling.
+To compress every word in `/usr/share/dict/words`, 235,887 words, `v1.0` took `~500ms`, `v2.0` took `~370ms`, but `v2.1` takes only `~295ms`!
+
+What about compressing the whole file, that is around 2.5MB, just as a long piece of text? Well, the results are even better: `v1.0` took `~700ms`, `v2.0` took `~465ms`, and `v2.1` takes only `~365ms`. This is almost a 50% improvement!
+
+Is there space for improvements? **Absolutely**! I guess that the compression algorithm can be further improved, and keep in mind that I didn't have time to do code profiling.
 
 ## Browser support
 
