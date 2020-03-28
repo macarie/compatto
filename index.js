@@ -16,7 +16,7 @@ const createMessage = (...messages) => {
 	return messages.join(' ')
 }
 
-const createTrie = strings => {
+const createTrie = (strings) => {
 	const trieRoot = new Map()
 
 	strings.forEach((string, index) => {
@@ -254,7 +254,7 @@ export const compatto = ({ dictionary } = {}) => {
 			if (typeof string !== 'string') {
 				throw new TypeError(
 					createMessage(
-						"The `string` argument must be of type 'string'.",
+						'The `string` argument must be of type ’string’.',
 						`Its type is \`${typeof string}\`.`
 					)
 				)
@@ -270,7 +270,7 @@ export const compatto = ({ dictionary } = {}) => {
 			) {
 				throw new TypeError(
 					createMessage(
-						"The `buffer` argument must be an instance of 'Uint8Array'.",
+						'The `buffer` argument must be an instance of ’Uint8Array’.',
 						`It is ${
 							bytes === undefined || bytes === null
 								? `\`${bytes}\``
