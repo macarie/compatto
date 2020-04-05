@@ -138,6 +138,48 @@ const compress = (string, trie) => {
 	}
 }
 
+const handleChunk254 = (bytes, index, bytesLength) => {
+	const byteIndex = index + 1
+
+	if (byteIndex >= bytesLength) {
+		throw new DecompressError(
+			createMessage(
+				`The \`bytes\` argument is malformed because it has ${bytesLength} elements.`,
+				`It wants to read at index ${byteIndex}.`
+			)
+		)
+	}
+
+	return [bytes.slice(byteIndex, byteIndex + 1), byteIndex + 1]
+}
+
+const handleChunk255 = (bytes, index, bytesLength) => {
+	const bytesCountIndex = index + 1
+
+	if (bytesCountIndex >= bytesLength) {
+		throw new DecompressError(
+			createMessage(
+				`The \`bytes\` argument is malformed because it has ${bytesLength} elements.`,
+				`It wants to read at index ${bytesCountIndex}.`
+			)
+		)
+	}
+
+	const verbatimStart = bytesCountIndex + 1
+	const verbatimEnd = bytesCountIndex + bytes[bytesCountIndex] + 2
+
+	if (verbatimEnd > bytesLength) {
+		throw new DecompressError(
+			createMessage(
+				`The \`bytes\` argument is malformed because it has ${bytesLength} elements.`,
+				`It wants to read from index ${bytesCountIndex} to ${verbatimEnd}.`
+			)
+		)
+	}
+
+	return [bytes.slice(verbatimStart, verbatimEnd), verbatimEnd]
+}
+
 const decompress = (bytes, dictionary) => {
 	const bytesLength = bytes.length
 	let index = 0
@@ -148,74 +190,44 @@ const decompress = (bytes, dictionary) => {
 		const chunk = bytes[index]
 
 		if (chunk === 254) {
-			index += 1
+			const [byteToDecode, nextIndex] = handleChunk254(
+				bytes,
+				index,
+				bytesLength
+			)
 
-			if (index >= bytesLength) {
-				throw new DecompressError(
-					createMessage(
-						`The \`bytes\` argument is malformed because it has ${bytesLength} elements.`,
-						`It wants to read at index ${index}.`
-					)
-				)
-			}
+			string += textDecoder.decode(byteToDecode)
 
-			string += textDecoder.decode(bytes.slice(index, index + 1))
-
-			index += 1
+			index = nextIndex
 
 			continue
 		}
 
 		if (chunk === 255) {
-			let verbatimStart
-			let verbatimEnd
-
 			const chunkToDecode = []
 
 			do {
-				index += 1
+				const [bytesToDecode, nextIndex] = handleChunk255(
+					bytes,
+					index,
+					bytesLength
+				)
 
-				if (index >= bytesLength) {
-					throw new DecompressError(
-						createMessage(
-							`The \`bytes\` argument is malformed because it has ${bytesLength} elements.`,
-							`It wants to read at index ${index}.`
-						)
-					)
-				}
+				push.apply(chunkToDecode, bytesToDecode)
 
-				verbatimStart = index + 1
-				verbatimEnd = index + bytes[index] + 2
-
-				if (verbatimEnd > bytesLength) {
-					throw new DecompressError(
-						createMessage(
-							`The \`bytes\` argument is malformed because it has ${bytesLength} elements.`,
-							`It wants to read from index ${index} to ${verbatimEnd}.`
-						)
-					)
-				}
-
-				push.apply(chunkToDecode, bytes.slice(verbatimStart, verbatimEnd))
-
-				index = verbatimEnd
+				index = nextIndex
 			} while (bytes[index] === 255)
 
 			if (bytes[index] === 254) {
-				index += 1
+				const [byteToDecode, nextIndex] = handleChunk254(
+					bytes,
+					index,
+					bytesLength
+				)
 
-				if (index >= bytesLength) {
-					throw new DecompressError(
-						createMessage(
-							`The \`bytes\` argument is malformed because it has ${bytesLength} elements.`,
-							`It wants to read at index ${index}.`
-						)
-					)
-				}
+				chunkToDecode.push(byteToDecode)
 
-				chunkToDecode.push(bytes.slice(index, index + 1))
-
-				index += 1
+				index = nextIndex
 			}
 
 			string += textDecoder.decode(Uint8Array.of(...chunkToDecode))
