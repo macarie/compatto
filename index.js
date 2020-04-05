@@ -172,7 +172,7 @@ const handleChunk255 = (bytes, index, bytesLength) => {
 		throw new DecompressError(
 			createMessage(
 				`The \`bytes\` argument is malformed because it has ${bytesLength} elements.`,
-				`It wants to read from index ${bytesCountIndex} to ${verbatimEnd}.`
+				`It wants to read from index ${verbatimStart} to ${verbatimEnd}.`
 			)
 		)
 	}
