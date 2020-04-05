@@ -167,7 +167,7 @@ test('`decompress()` cannot use malformed buffer', (t) => {
 		{
 			instanceOf: DecompressError,
 			message:
-				'The `bytes` argument is malformed because it has 3 elements. It wants to read from index 1 to 53.'
+				'The `bytes` argument is malformed because it has 3 elements. It wants to read from index 2 to 53.'
 		}
 	)
 
