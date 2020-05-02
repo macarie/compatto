@@ -70,6 +70,9 @@
 			],
 			"import/no-useless-path-segments": [
 				"off"
+			],
+			"unicorn/no-fn-reference-in-iterator": [
+				"off"
 			]
 		},
 		"ignores": [
