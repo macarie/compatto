@@ -13,6 +13,12 @@ Compatto is based on [antirez](https://github.com/antirez/)'s [smaz](https://git
 - 🍯 Support for Unicode characters, like emojis
 - 🗄 User-definable dictionary
 
+## Compression ratio
+
+Being a dictionary-based compression algorithm, the compression ratio is heavily influenced by the dictionary one uses.
+
+With the default dictionary the compression ratio is around `1.67` for [The Great Gatsby](http://gutenberg.net.au/ebooks02/0200041.txt): it is compressed from `269,716` bytes in just `161,583`, in `70ms`. A simple string like `this is a string` tho, is compressed from `16` bytes in `6`, so the compression ratio would be `2.66`... Results may vary, I guess 😅
+
 ## Install
 
 ```console
