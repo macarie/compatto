@@ -114,9 +114,14 @@ This implementation change gave compatto a big performance boost 🚌💨
 
 In `v2.1` the `compress()` algorithm was simplified, thus leading to a performance improvement of about 20% compared to `v2.0` 🐌
 
-To compress every word in `/usr/share/dict/words`, 235,887 words, `v1.0` took `~500ms`, `v2.0` took `~370ms`, but `v2.1` takes only `~295ms`!
+Below is a little table that indicates `compress()`'s performance improvements over the various versions. The file used to test the library is `/usr/share/dict/words`: in the first row, the file was split over `\n`, while in the second row the whole file was used as a long piece of text.
 
-What about compressing the whole file, that is around 2.5MB, just as a long piece of text? Well, the results are even better: `v1.0` took `~700ms`, `v2.0` took `~465ms`, and `v2.1` takes only `~365ms`. This is almost a 50% improvement!
+| Data           |   v1.0   |   v2.0   |   v2.1   |
+| :------------- | :------: | :------: | :------: |
+| 235,887 words  | `~500ms` | `~370ms` | `~295ms` |
+| 2.5MB raw text | `~700ms` | `~465ms` | `~365ms` |
+
+As you can see the performance improved a lot: now compressing a lot of small words takes about 40% less time, and almost 50% less to compress a long piece of text if we keep `v1.0` as reference!
 
 Is there space for improvements? **Absolutely**! I guess that the compression algorithm can be further improved, and keep in mind that I didn't have time to do code profiling.
 
