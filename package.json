@@ -1,6 +1,6 @@
 {
 	"name": "compatto",
-	"version": "2.1.4",
+	"version": "2.1.5",
 	"description": "Tiny and fast string compression library with Unicode support",
 	"license": "MIT",
 	"type": "module",
