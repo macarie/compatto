@@ -4,10 +4,18 @@
 	"description": "Tiny and fast string compression library with Unicode support",
 	"license": "MIT",
 	"type": "module",
+	"main": "./cjs/index.cjs",
 	"exports": {
-		".": "./index.js",
-		"./dictionary": "./dictionary.js"
+		".": {
+			"import": "./index.js",
+			"require": "./cjs/index.cjs"
+		},
+		"./dictionary": {
+			"import": "./dictionary.js",
+			"require": "./cjs/dictionary.cjs"
+		}
 	},
+	"types": "./index.d.ts",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/macarie/compatto.git"
@@ -25,14 +33,19 @@
 		"node": ">=11"
 	},
 	"scripts": {
-		"test": "xo && c8 ava --verbose",
-		"coverage": "c8 report --reporter=text-lcov | codecov --pipe --disable=gcov"
+		"test:xo": "xo",
+		"test:ava": "c8 ava --verbose",
+		"test": "run-p -s test:*",
+		"coverage": "c8 report --reporter=text-lcov | codecov --pipe --disable=gcov",
+		"transpile": "esbuild --format=cjs --platform=node --outdir=cjs ./index.js ./dictionary.js"
 	},
 	"files": [
 		"index.js",
 		"index.d.ts",
 		"dictionary.js",
-		"dictionary.d.ts"
+		"dictionary.d.ts",
+		"cjs/index.cjs",
+		"cjs/dictionary.cjs"
 	],
 	"keywords": [
 		"smaz",
@@ -56,6 +69,8 @@
 		"ava": "^3.15.0",
 		"c8": "^7.7.1",
 		"codecov": "^3.8.1",
+		"esbuild": "^0.11.16",
+		"npm-run-all": "^4.1.5",
 		"prettier": "^2.2.1",
 		"xo": "^0.39.1"
 	},
