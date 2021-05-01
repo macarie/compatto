@@ -12,13 +12,14 @@ const words = readFileSync('/usr/share/dict/words', 'utf-8')
 test('`compress()` basic functionality', (t) => {
 	const buffer = compress('this is a string')
 
-	t.deepEqual(Uint8Array.of(...[155, 56, 172, 62, 195, 70]), buffer)
+	t.deepEqual(buffer, Uint8Array.of(...[155, 56, 172, 62, 195, 70]))
 })
 
 test('`compress()` should work with unicode characters', (t) => {
 	const buffer = compress('this is a string 👍🏼')
 
 	t.deepEqual(
+		buffer,
 		Uint8Array.of(
 			...[
 				155,
@@ -39,8 +40,7 @@ test('`compress()` should work with unicode characters', (t) => {
 				143,
 				188
 			]
-		),
-		buffer
+		)
 	)
 })
 
@@ -53,9 +53,9 @@ test('`compress()` should work with large inputs', (t) => {
 test('`compress()` should flush the verbatim buffer when it gets to 256 elements', (t) => {
 	const compressed = compress('='.repeat(260))
 
-	t.is(255, compressed[0])
-	t.is(255, compressed[1])
-	t.is(255, compressed[258])
+	t.is(compressed[0], 255)
+	t.is(compressed[1], 255)
+	t.is(compressed[258], 255)
 })
 
 test('`compress()` cannot use an argument that is not a string', (t) => {
@@ -67,7 +67,7 @@ test('`compress()` cannot use an argument that is not a string', (t) => {
 test('`decompress()` basic functionality', (t) => {
 	const string = decompress(Uint8Array.of(...[155, 56, 172, 62, 195, 70]))
 
-	t.is('this is a string', string)
+	t.is(string, 'this is a string')
 })
 
 test('`decompress()` should work with unicode characters', (t) => {
@@ -75,7 +75,7 @@ test('`decompress()` should work with unicode characters', (t) => {
 	const compressed = compress(string)
 	const decompressed = decompress(compressed)
 
-	t.is(string, decompressed)
+	t.is(decompressed, string)
 })
 
 test('`decompress()` should work with extra-long incompressible strings', (t) => {
@@ -83,15 +83,15 @@ test('`decompress()` should work with extra-long incompressible strings', (t) =>
 	let compressed = compress(string)
 	let decompressed = decompress(compressed)
 
-	t.is(262, compressed.length)
-	t.is(string, decompressed)
+	t.is(compressed.length, 262)
+	t.is(decompressed, string)
 
 	string = `${'='.repeat(253)}📮`
 	compressed = compress(string)
 	decompressed = decompress(compressed)
 
-	t.is(260, compressed.length)
-	t.is(string, decompressed)
+	t.is(compressed.length, 260)
+	t.is(decompressed, string)
 })
 
 test('`decompress()` should work with large buffers', (t) => {
@@ -195,11 +195,11 @@ test('`decompress()` cannot use malformed buffer', (t) => {
 test('Verify `compress()`’s output with `decompress()`', (t) => {
 	const decompressedWords = decompress(compress(words))
 
-	t.deepEqual(words, decompressedWords)
+	t.deepEqual(decompressedWords, words)
 
-	const compressedWords = words.split('\n').map(compress)
+	const compressedWords = words.split('\n').map((word) => compress(word))
 
-	t.deepEqual(words, compressedWords.map(decompress).join('\n'))
+	t.deepEqual(compressedWords.map((word) => decompress(word)).join('\n'), words)
 })
 
 test('`compatto()` should create a new `compatto` object', (t) => {
@@ -208,7 +208,7 @@ test('`compatto()` should create a new `compatto` object', (t) => {
 	const compattoKeys = ['compress', 'decompress']
 	const compattoCopyKeys = Object.keys(compattoCopy)
 
-	t.deepEqual(compattoKeys, compattoCopyKeys)
+	t.deepEqual(compattoCopyKeys, compattoKeys)
 })
 
 test('`compatto()` should create a working new `compatto` object', (t) => {
@@ -218,8 +218,8 @@ test('`compatto()` should create a working new `compatto` object', (t) => {
 	const compressed = compress(string)
 	const decompressed = decompress(compressed)
 
-	t.deepEqual(compressed, compattoCopy.compress(string))
-	t.is(decompressed, compattoCopy.decompress(compressed))
+	t.deepEqual(compattoCopy.compress(string), compressed)
+	t.is(compattoCopy.decompress(compressed), decompressed)
 })
 
 test('`compatto()` should use a new dictionary', (t) => {
@@ -227,13 +227,13 @@ test('`compatto()` should use a new dictionary', (t) => {
 
 	const compressed = compattoCopy.compress('aa b')
 
-	t.deepEqual(Uint8Array.of(...[0, 254, 98]), compressed)
+	t.deepEqual(compressed, Uint8Array.of(...[0, 254, 98]))
 })
 
 test('`compatto()` cannot use malformed dictionary', (t) => {
 	t.throws(
 		() => {
-			compatto({ dictionary: new Array(300) })
+			compatto({ dictionary: Array.from({ length: 300 }) })
 		},
 		{
 			instanceOf: TypeError,

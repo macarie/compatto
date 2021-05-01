@@ -19,7 +19,7 @@ const createMessage = (...messages) => {
 const createTrie = (strings) => {
 	const trieRoot = new Map()
 
-	strings.forEach((string, index) => {
+	for (const [index, string] of strings.entries()) {
 		let trie = trieRoot
 
 		const characters = string[Symbol.iterator]()
@@ -39,7 +39,7 @@ const createTrie = (strings) => {
 		}
 
 		trie.value = index
-	})
+	}
 
 	return trieRoot
 }
@@ -86,8 +86,7 @@ const flushVerbatim = (verbatim, bytesToRemove) => {
 	const chunk = []
 
 	if (bytesToRemove > 1) {
-		chunk.push(255)
-		chunk.push(bytesToRemove - 1)
+		chunk.push(255, bytesToRemove - 1)
 	} else {
 		chunk.push(254)
 	}
@@ -133,7 +132,7 @@ const compress = (string, trie) => {
 
 	try {
 		return Uint8Array.of(...bytes)
-	} catch (_) {
+	} catch {
 		return new Uint8Array(bytes)
 	}
 }
