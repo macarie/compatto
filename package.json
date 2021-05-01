@@ -53,11 +53,11 @@
 		"browser"
 	],
 	"devDependencies": {
-		"ava": "^3.8.1",
-		"c8": "^7.1.0",
-		"codecov": "^3.6.5",
-		"prettier": "^2.0.5",
-		"xo": "^0.30.0"
+		"ava": "^3.15.0",
+		"c8": "^7.7.1",
+		"codecov": "^3.8.1",
+		"prettier": "^2.2.1",
+		"xo": "^0.39.1"
 	},
 	"xo": {
 		"prettier": true,
