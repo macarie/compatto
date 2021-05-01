@@ -37,7 +37,7 @@
 		"test:ava": "c8 ava --verbose",
 		"test": "run-p -s test:*",
 		"coverage": "c8 report --reporter=text-lcov | codecov --pipe --disable=gcov",
-		"transpile": "esbuild --format=cjs --platform=node --outdir=cjs ./index.js ./dictionary.js"
+		"transpile": "esbuild --format=cjs --platform=node --outdir=cjs --out-extension:.js=.cjs ./index.js ./dictionary.js"
 	},
 	"files": [
 		"index.js",
